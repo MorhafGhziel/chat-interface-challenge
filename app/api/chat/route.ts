@@ -1,27 +1,54 @@
 import { NextResponse } from "next/server";
 
-// Using a more accessible model
+// Using a reliable and efficient model
 const HUGGING_FACE_API =
-  "https://api-inference.huggingface.co/models/google/flan-t5-small";
+  "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta";
 
-// Simple delay function for retries
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+// Format messages for the Zephyr model
+async function formatMessage(messages: ChatMessage[]): Promise<string> {
+  const formattedMessages = messages.map((msg) => {
+    if (msg.role === "user") {
+      return `<|user|>\n${msg.content}\n<|assistant|>\n`;
+    } else {
+      return `${msg.content}\n`;
+    }
+  });
+  return formattedMessages.join("");
+}
+
+// Simple delay function for retries with longer waits
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function fetchWithRetry(
   url: string,
   options: RequestInit,
-  maxRetries = 3
+  maxRetries = 5
 ) {
+  let lastError = null;
   for (let i = 0; i < maxRetries; i++) {
     try {
       console.log(`Attempt ${i + 1}: Sending request to Hugging Face API`);
-      console.log("Using headers:", JSON.stringify(options.headers, null, 2));
 
       const response = await fetch(url, options);
       console.log(`Response status: ${response.status}`);
 
+      if (response.status === 503) {
+        // Service unavailable - wait longer
+        const waitTime = Math.pow(2, i + 1) * 2000; // Longer wait times
+        console.log(
+          `Service unavailable, waiting ${waitTime}ms before retry ${i + 1}`
+        );
+        await delay(waitTime);
+        continue;
+      }
+
       if (response.status === 429) {
-        const waitTime = Math.pow(2, i) * 1000;
+        const waitTime = Math.pow(2, i) * 1500;
         console.log(
           `Rate limited, waiting ${waitTime}ms before retry ${i + 1}`
         );
@@ -32,7 +59,6 @@ async function fetchWithRetry(
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`API Error Response:`, errorText);
-        console.error("Response headers:", response.headers);
         throw new Error(
           `API request failed with status ${response.status}: ${errorText}`
         );
@@ -41,11 +67,13 @@ async function fetchWithRetry(
       return response;
     } catch (error) {
       console.error(`Attempt ${i + 1} failed:`, error);
-      if (i === maxRetries - 1) throw error;
-      await delay(1000);
+      lastError = error;
+      if (i === maxRetries - 1) break;
+      // Increased delay between retries
+      await delay(2000 * (i + 1));
     }
   }
-  throw new Error("Max retries reached");
+  throw lastError || new Error("Max retries reached");
 }
 
 export async function POST(req: Request) {
@@ -89,8 +117,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const userMessage = messages[messages.length - 1].content;
-    console.log("API Route: Processing user message:", userMessage);
+    const formattedMessages = await formatMessage(messages);
+    console.log("API Route: Processing formatted message:", formattedMessages);
 
     const response = await fetchWithRetry(HUGGING_FACE_API, {
       method: "POST",
@@ -99,10 +127,13 @@ export async function POST(req: Request) {
         Authorization: `Bearer ${apiToken}`,
       },
       body: JSON.stringify({
-        inputs: userMessage,
+        inputs: formattedMessages,
         parameters: {
-          max_length: 100,
+          max_new_tokens: 512,
           temperature: 0.7,
+          top_p: 0.95,
+          do_sample: true,
+          return_full_text: false,
         },
       }),
     });
@@ -113,15 +144,20 @@ export async function POST(req: Request) {
     // Handle different response formats
     let generatedText = "";
     if (Array.isArray(result) && result[0]?.generated_text) {
-      generatedText = result[0].generated_text;
+      generatedText = result[0].generated_text.trim();
     } else if (Array.isArray(result) && typeof result[0] === "string") {
-      generatedText = result[0];
+      generatedText = result[0].trim();
     } else if (typeof result === "string") {
-      generatedText = result;
+      generatedText = result.trim();
     } else {
       console.error("API Route: Unexpected response format:", result);
       throw new Error("Unexpected response format from API");
     }
+
+    // Clean up the response
+    generatedText = generatedText
+      .replace(/<\|user\|>|<\|assistant\|>/g, "")
+      .trim();
 
     console.log("API Route: Generated response:", generatedText);
 
@@ -148,6 +184,9 @@ export async function POST(req: Request) {
       } else if (error.message.includes("401")) {
         userMessage =
           "Authentication failed. Please check your Hugging Face account and generate a new API token.";
+      } else if (error.message.includes("503")) {
+        userMessage =
+          "The chat service is currently initializing. Please try again in a few moments.";
       } else if (error.message.includes("response format")) {
         userMessage =
           "The chat service returned an unexpected response. Please try again.";

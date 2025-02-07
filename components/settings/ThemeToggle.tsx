@@ -20,7 +20,7 @@ export function ThemeToggle({ isDarkMode, onToggle }: ThemeToggleProps) {
           height={20}
           className={COMMON_CLASSES.iconBase}
         />
-        <span className={COMMON_CLASSES.menuText}>
+        <span className="text-sm text-gray-700 dark:text-white">
           {isDarkMode ? "Dark Mode" : "Light Mode"}
         </span>
       </div>

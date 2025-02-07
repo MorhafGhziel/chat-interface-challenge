@@ -301,32 +301,25 @@ export default function ChatInput() {
   };
 
   return (
-    <div className="h-[calc(100vh-64px)]">
+    <div className="h-[calc(100vh-64px)] bg-[#f9fafb] dark:bg-gray-900 transition-colors duration-250">
       {/* Messages Display */}
       <div
         className={`h-[calc(100%-130px)] ${
           messages.length > 0 || error || isLoading
             ? "overflow-y-auto"
-            : "overflow-hidden flex items-center justify-center"
+            : "overflow-hidden"
         }`}
       >
         <div className="min-h-full w-full max-w-5xl mx-auto space-y-4 px-3 sm:px-6 py-4">
-          <div className="space-y-4">
+          <div className="space-y-4 h-full">
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded relative animate-fade-in text-sm">
+              <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 px-3 sm:px-4 py-2 sm:py-3 rounded relative animate-fade-in text-sm transition-colors duration-250">
                 {error}
               </div>
             )}
             {messages.length === 0 && !error && !isLoading && (
-              <div className="flex items-center justify-center">
-                <div className="text-center text-gray-500 animate-fade-in">
-                  <Image
-                    src="/assets/icons/logo.svg"
-                    alt="logo"
-                    width={40}
-                    height={40}
-                    className="mx-auto mb-3 opacity-50"
-                  />
+              <div className="flex items-center justify-center h-[calc(100vh-250px)]">
+                <div className="text-center text-gray-500 dark:text-gray-400 animate-fade-in transition-colors duration-250">
                   <p className="text-base sm:text-xl">
                     Start a conversation by sending a message
                   </p>
@@ -352,7 +345,7 @@ export default function ChatInput() {
                   className={`inline-block rounded-2xl px-3 sm:px-4 py-2 transform transition-all duration-300 ease-out ${
                     message.role === "user"
                       ? "bg-blue-500 text-white rounded-br-none hover:bg-blue-600 ml-auto"
-                      : "bg-gray-100 text-black rounded-bl-none hover:bg-gray-200"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-none hover:bg-gray-200 dark:hover:bg-gray-700"
                   }`}
                 >
                   <div className="flex flex-col gap-1.5 sm:gap-2">
@@ -364,7 +357,9 @@ export default function ChatInput() {
                           width={10}
                           height={10}
                           className={
-                            message.role === "user" ? "invert" : "opacity-50"
+                            message.role === "user"
+                              ? "invert"
+                              : "opacity-50 dark:invert"
                           }
                         />
                         voice message
@@ -387,8 +382,8 @@ export default function ChatInput() {
                       className={`text-[10px] ${
                         message.role === "user"
                           ? "text-blue-100"
-                          : "text-gray-500"
-                      } text-left`}
+                          : "text-gray-500 dark:text-gray-400"
+                      } text-left transition-colors duration-250`}
                     >
                       {message.timestamp}
                     </div>
@@ -399,20 +394,15 @@ export default function ChatInput() {
           ))}
           {isLoading && (
             <div className="flex justify-start animate-fade-in">
-              <div className="bg-gray-100 rounded-2xl px-4 py-2 rounded-bl-none">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                    style={{ animationDelay: "0ms" }}
-                  />
-                  <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                    style={{ animationDelay: "150ms" }}
-                  />
-                  <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                    style={{ animationDelay: "300ms" }}
-                  />
+              <div className="px-5 py-3">
+                <div className="relative">
+                  <div className="w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full animate-float">
+                    <div className="absolute inset-0 bg-blue-500/30 dark:bg-blue-400/30 rounded-full animate-ripple" />
+                    <div
+                      className="absolute inset-0 bg-blue-500/20 dark:bg-blue-400/20 rounded-full animate-ripple"
+                      style={{ animationDelay: "0.5s" }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -422,7 +412,7 @@ export default function ChatInput() {
       </div>
 
       {/* Bottom Container for Suggestions and Input */}
-      <div className="h-[130px] bg-white border-t border-gray-200">
+      <div className="h-[130px] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 transition-colors duration-250">
         {/* Suggestions */}
         <Suggestions
           suggestions={currentSuggestions}
@@ -431,7 +421,7 @@ export default function ChatInput() {
         />
 
         {/* Input Form */}
-        <div className="h-[76px] border-t border-gray-200 shadow-lg">
+        <div className="h-[76px] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg transition-colors duration-250">
           <form
             onSubmit={handleSubmit}
             className="max-w-5xl mx-auto flex items-center justify-center gap-2 p-4 h-full"
@@ -445,7 +435,7 @@ export default function ChatInput() {
                 placeholder={
                   isListening ? "Listening..." : "Type your message..."
                 }
-                className="w-full p-3 pl-4 pr-12 rounded-full border border-gray-200 focus:outline-none focus:border-blue-500 transition-all duration-200"
+                className="w-full p-3 pl-4 pr-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-250"
                 disabled={isLoading}
               />
               <button
@@ -454,7 +444,7 @@ export default function ChatInput() {
                 className={`absolute right-3 top-1/2 -translate-y-1/2 transition-all duration-200 p-2 rounded-full ${
                   isListening
                     ? "bg-red-500 animate-pulse hover:bg-red-600"
-                    : "hover:bg-gray-100"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
                 disabled={isLoading}
               >
@@ -466,7 +456,7 @@ export default function ChatInput() {
                   className={`transition-all duration-200 ${
                     isListening
                       ? "invert brightness-200"
-                      : "opacity-70 hover:opacity-100"
+                      : "opacity-70 hover:opacity-100 dark:invert"
                   }`}
                 />
               </button>

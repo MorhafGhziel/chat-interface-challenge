@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 
 interface SuggestionsProps {
@@ -38,7 +40,7 @@ export default function Suggestions({
         <button
           key={index}
           onClick={() => onSuggestionClick(suggestion)}
-          className="px-3 sm:px-6 py-1.5 sm:py-2 bg-gray-100 text-xs sm:text-sm text-gray-700 rounded-full hover:bg-gray-200 transition-all duration-200 flex-1 sm:flex-initial shadow-sm hover:shadow-md max-w-[160px] sm:max-w-[300px] text-ellipsis overflow-hidden whitespace-nowrap"
+          className="px-3 sm:px-6 py-1.5 sm:py-2 bg-gray-100 dark:bg-gray-800 text-xs sm:text-sm text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-250 flex-1 sm:flex-initial shadow-sm hover:shadow-md max-w-[160px] sm:max-w-[300px] text-ellipsis overflow-hidden whitespace-nowrap"
           disabled={isLoading}
           title={suggestion}
         >

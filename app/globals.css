@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+  }
+
+  .dark {
+    --background: #1a1a1a;
+    --foreground: #ffffff;
+  }
+
+  body {
+    @apply transition-colors duration-250;
+  }
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;

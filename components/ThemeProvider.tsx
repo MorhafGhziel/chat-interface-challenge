@@ -7,18 +7,24 @@ export default function ThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  // Check system preference and localStorage on mount
   useEffect(() => {
-    const isDark =
-      localStorage.getItem("theme") === "dark" ||
-      (!localStorage.getItem("theme") &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const storedTheme = localStorage.getItem("theme");
 
-    if (isDark) {
-      document.documentElement.classList.add("dark");
+    // Default to light mode if no theme is stored
+    if (!storedTheme) {
+      localStorage.setItem("theme", "light");
+      document.documentElement.classList.remove("dark");
+      return;
     }
 
-    // Listen for system theme changes
+    // Apply stored theme
+    if (storedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    // Listen for system theme changes only if no preference is set
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = (e: MediaQueryListEvent) => {
       if (!localStorage.getItem("theme")) {

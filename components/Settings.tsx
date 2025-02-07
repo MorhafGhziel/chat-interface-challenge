@@ -1,7 +1,10 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import Image from "next/image";
+import { COMMON_CLASSES, MENU_SECTIONS, ANIMATION_DURATION } from "@/constants";
+import { MenuSection } from "./settings/MenuSection";
+import { MenuItem } from "./settings/MenuItem";
+import { ThemeToggle } from "./settings/ThemeToggle";
 
 interface SettingsProps {
   isOpen: boolean;
@@ -15,7 +18,13 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
 
   // Check initial theme on mount
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
+    const storedTheme = localStorage.getItem("theme");
+    // Default to light mode if no theme is stored
+    if (!storedTheme) {
+      localStorage.setItem("theme", "light");
+      document.documentElement.classList.remove("dark");
+    }
+    const isDark = storedTheme === "dark";
     setIsDarkMode(isDark);
   }, []);
 
@@ -29,7 +38,7 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
     setIsClosing(true);
     const timer = setTimeout(() => {
       onClose();
-    }, 400);
+    }, ANIMATION_DURATION.menuClose);
     return () => clearTimeout(timer);
   }, [onClose]);
 
@@ -69,122 +78,47 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
       ref={menuRef}
       className={`absolute top-[60px] sm:top-[52px] right-0 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 ${
         isClosing ? "animate-slide-up" : "animate-slide-down"
-      } origin-top transition-colors-all duration-250`}
+      } origin-top ${COMMON_CLASSES.transitionBase}`}
     >
-      <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 transition-colors-all duration-250">
-        <h3 className="font-semibold text-sm text-gray-900 dark:text-white transition-colors duration-250">
+      <div
+        className={`px-4 py-2 border-b ${COMMON_CLASSES.sectionDivider} ${COMMON_CLASSES.transitionBase}`}
+      >
+        <h3 className="font-semibold text-sm text-gray-900 dark:text-white">
           Settings
         </h3>
       </div>
 
       <div className="py-1">
-        {/* Language Section */}
-        <div className="px-3 py-2">
-          <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-250">
-            LANGUAGE
-          </h4>
-          <button className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors duration-250">
-            <Image
-              src="/assets/icons/language.svg"
-              alt="language"
-              width={20}
-              height={20}
-              className="opacity-70 dark:invert transition-[filter] duration-250"
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-200 transition-colors duration-250">
-              Change Language
-            </span>
-          </button>
-        </div>
+        <MenuSection title={MENU_SECTIONS.LANGUAGE.title}>
+          {MENU_SECTIONS.LANGUAGE.items.map((item) => (
+            <MenuItem key={item.label} icon={item.icon} label={item.label} />
+          ))}
+        </MenuSection>
 
-        {/* Accessibility Section */}
-        <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-700 transition-colors duration-250">
-          <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-250">
-            ACCESSIBILITY
-          </h4>
-          <button className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors duration-250">
-            <Image
-              src="/assets/icons/accessibility.svg"
-              alt="accessibility"
-              width={20}
-              height={20}
-              className="opacity-70 dark:invert transition-[filter] duration-250"
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-200 transition-colors duration-250">
-              Accessibility Settings
-            </span>
-          </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors duration-250">
-            <Image
-              src="/assets/icons/keyboard.svg"
-              alt="keyboard"
-              width={20}
-              height={20}
-              className="opacity-70 dark:invert transition-[filter] duration-250"
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-200 transition-colors duration-250">
-              Keyboard Shortcuts
-            </span>
-          </button>
-        </div>
+        <MenuSection
+          title={MENU_SECTIONS.ACCESSIBILITY.title}
+          className={COMMON_CLASSES.sectionDivider}
+        >
+          {MENU_SECTIONS.ACCESSIBILITY.items.map((item) => (
+            <MenuItem key={item.label} icon={item.icon} label={item.label} />
+          ))}
+        </MenuSection>
 
-        {/* About Section */}
-        <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-700 transition-colors duration-250">
-          <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-250">
-            ABOUT
-          </h4>
-          <button className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors duration-250">
-            <Image
-              src="/assets/icons/info.svg"
-              alt="info"
-              width={20}
-              height={20}
-              className="opacity-70 dark:invert transition-[filter] duration-250"
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-200 transition-colors duration-250">
-              About AI Chat Assistant
-            </span>
-          </button>
-        </div>
+        <MenuSection
+          title={MENU_SECTIONS.ABOUT.title}
+          className={COMMON_CLASSES.sectionDivider}
+        >
+          {MENU_SECTIONS.ABOUT.items.map((item) => (
+            <MenuItem key={item.label} icon={item.icon} label={item.label} />
+          ))}
+        </MenuSection>
 
-        {/* Appearance Section */}
-        <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-700 transition-colors duration-250">
-          <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-250">
-            APPEARANCE
-          </h4>
-          <div
-            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md cursor-pointer transition-colors duration-250"
-            onClick={toggleTheme}
-          >
-            <div className="flex items-center gap-3">
-              <Image
-                src={
-                  isDarkMode
-                    ? "/assets/icons/theme-dark.svg"
-                    : "/assets/icons/theme-light.svg"
-                }
-                alt="theme"
-                width={20}
-                height={20}
-                className="opacity-70 dark:invert transition-[filter] duration-250"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-200 transition-colors duration-250">
-                {isDarkMode ? "Dark Mode" : "Light Mode"}
-              </span>
-            </div>
-            <div
-              className={`w-10 h-6 rounded-full p-1 transition-colors duration-300 ease-in-out ${
-                isDarkMode ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
-              }`}
-            >
-              <div
-                className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-300 ease-in-out ${
-                  isDarkMode ? "translate-x-4" : "translate-x-0"
-                }`}
-              />
-            </div>
-          </div>
-        </div>
+        <MenuSection
+          title={MENU_SECTIONS.APPEARANCE.title}
+          className={COMMON_CLASSES.sectionDivider}
+        >
+          <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
+        </MenuSection>
       </div>
     </div>
   );

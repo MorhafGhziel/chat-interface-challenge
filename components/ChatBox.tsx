@@ -310,10 +310,10 @@ export default function ChatInput() {
             : "overflow-hidden flex items-center justify-center"
         }`}
       >
-        <div className="min-h-full max-w-5xl mx-auto space-y-4 px-6 py-4">
-          <div className="space-y-4 mb-8">
+        <div className="min-h-full w-full max-w-5xl mx-auto space-y-4 px-3 sm:px-6 py-4">
+          <div className="space-y-4">
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative animate-fade-in">
+              <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded relative animate-fade-in text-sm">
                 {error}
               </div>
             )}
@@ -323,11 +323,11 @@ export default function ChatInput() {
                   <Image
                     src="/assets/icons/logo.svg"
                     alt="logo"
-                    width={48}
-                    height={48}
-                    className="mx-auto mb-4 opacity-50"
+                    width={40}
+                    height={40}
+                    className="mx-auto mb-3 opacity-50"
                   />
-                  <p className="text-xl">
+                  <p className="text-base sm:text-xl">
                     Start a conversation by sending a message
                   </p>
                 </div>
@@ -339,21 +339,23 @@ export default function ChatInput() {
               key={message.id}
               className={`flex ${
                 message.role === "user" ? "justify-end" : "justify-start"
-              } animate-fade-in-up w-full mb-4`}
+              } animate-fade-in-up w-full mb-3`}
             >
               <div
                 className={`flex flex-col gap-1 ${
-                  message.role === "assistant" ? "max-w-[85%]" : "max-w-[70%]"
+                  message.role === "assistant"
+                    ? "max-w-[90%] sm:max-w-[85%]"
+                    : "max-w-[85%] sm:max-w-[70%]"
                 }`}
               >
                 <div
-                  className={`inline-block rounded-2xl px-4 py-2 transform transition-all duration-300 ease-out ${
+                  className={`inline-block rounded-2xl px-3 sm:px-4 py-2 transform transition-all duration-300 ease-out ${
                     message.role === "user"
                       ? "bg-blue-500 text-white rounded-br-none hover:bg-blue-600 ml-auto"
                       : "bg-gray-100 text-black rounded-bl-none hover:bg-gray-200"
                   }`}
                 >
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1.5 sm:gap-2">
                     {message.isVoiceMessage && (
                       <div className="flex items-center gap-1 text-[10px] opacity-75">
                         <Image
@@ -377,7 +379,7 @@ export default function ChatInput() {
                         />
                       </div>
                     ) : (
-                      <div className="break-words whitespace-normal">
+                      <div className="break-words whitespace-normal text-sm sm:text-base">
                         {message.content}
                       </div>
                     )}

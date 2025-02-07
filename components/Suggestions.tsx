@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 interface SuggestionsProps {
   suggestions: string[];
   onSuggestionClick: (suggestion: string) => void;
@@ -9,11 +11,26 @@ export default function Suggestions({
   onSuggestionClick,
   isLoading,
 }: SuggestionsProps) {
-  // Show only 2 suggestions on mobile, 3 on desktop
-  const displayedSuggestions = suggestions.slice(
-    0,
-    window.innerWidth < 640 ? 2 : 3
+  const [displayedSuggestions, setDisplayedSuggestions] = useState<string[]>(
+    []
   );
+
+  useEffect(() => {
+    // Update suggestions based on window width
+    const updateSuggestions = () => {
+      const count = window.innerWidth < 640 ? 2 : 3;
+      setDisplayedSuggestions(suggestions.slice(0, count));
+    };
+
+    // Initial update
+    updateSuggestions();
+
+    // Add resize listener
+    window.addEventListener("resize", updateSuggestions);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", updateSuggestions);
+  }, [suggestions]);
 
   return (
     <div className="h-[54px] max-w-5xl mx-auto py-2 sm:py-4 px-2 flex items-center justify-center gap-3">

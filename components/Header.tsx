@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Header() {
   return (
-    <header className="flex flex-col sm:flex-row items-center gap-4 sm:justify-between p-4 border-b">
+    <header className="h-16 sticky top-0 z-50 bg-white flex flex-col sm:flex-row items-center gap-4 sm:justify-between p-4 border-b shadow-sm">
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 w-full">
         <div className="flex items-center gap-4">
           <div className="bg-[#3c82f6] rounded-full p-2 flex items-center justify-center">
